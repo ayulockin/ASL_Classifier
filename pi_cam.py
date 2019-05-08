@@ -12,18 +12,18 @@ classes = {
     'x': 33, 'y': 34, 'z': 35,
 }
 
-model = load_model('asl_model.h5')
+model = load_model('asl_model_better.h5')
 print('model loaded')
 ##print(model.summary)
-##
+
 def identifyGesture(img, count):
     cv2.imwrite('images/{}.jpeg'.format(count), img)
-    size_img = 64,64
+    size_img = 200,200
     img = cv2.resize(img, size_img)
     cv2.imwrite('images/{}_1.jpeg'.format(count), img)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = np.array(img)
-    img = img.reshape((1,64,64,3))
+    img = img.reshape((1,200,200,3))
     prediction = model.predict_classes(img)
     key = (key for key, value in classes.items() if value == prediction[0])
     return(list(key)[0])
@@ -35,8 +35,6 @@ cv2.namedWindow('Camera Output')
 cv2.namedWindow('Tone Selector')
 ##cv2.namedWindow('Hand')
 ##cv2.namedWindow('HandTrain')
-
-palm_cascade = cv2.CascadeClassifier('palm.xml')
 
 cap = cv2.VideoCapture(0)
 
@@ -85,7 +83,7 @@ while(True):
     
     ret, frame = cap.read()
     frame = cv2.flip(frame, 1)
-##    frame = cv2.resize(frame, (400,400))
+    frame = cv2.resize(frame, (400,400))
     converted = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 ##    converted = cv2.GaussianBlur(converted, (5, 5), 0)
     skinRegion = cv2.inRange(converted, lower, upper)
@@ -96,7 +94,7 @@ while(True):
     # sorting contours by area. Largest area first.
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
     if(len(contours)==0):
-        print('fucked')
+        print('bad')
     cnt = contours[0]
     ret = cv2.matchShapes(cnt, prevcnt, 2, 0.0)
     prevcnt = contours[0]
@@ -154,10 +152,3 @@ while(True):
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()
-
-
-
-
-
-
-
